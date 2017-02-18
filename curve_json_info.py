@@ -64,6 +64,7 @@ def read_curve_info(data):
             pointArray.append(i[0], i[1], i[2], 1.0)
 
         curveFn.setCVs(pointArray, OpenMaya.MSpace.kWorld)
+        curveFn.updateCurve()
 
 def export_curve_data(objs, file_path):
     data = None
