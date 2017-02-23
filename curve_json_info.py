@@ -40,7 +40,7 @@ def write_curve_info(obj):
 
         cv_pos_list = []
         override_color = OpenMaya.MFnDependencyNode(shape_mObj).findPlug('overrideColor').asInt()
-        curve_info_dict = {mDag.partialPathName(): {'cv_position': cv_pos_list, 'override_color': override_color}}
+        curve_info_dict = {mDag.partialPathName(): {'cvs': cv_pos_list, 'override_color': override_color}}
 
         for i in range(pointArray.length()):
             cv_pos_list.append([pointArray[i].x, pointArray[i].y, pointArray[i].z])
