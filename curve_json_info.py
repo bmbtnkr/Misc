@@ -1,4 +1,5 @@
 import json
+import maya.cmds as cmds
 import maya.OpenMaya as OpenMaya
 
 
@@ -29,22 +30,24 @@ def write_curve_info(obj):
     mDag.numberOfShapesDirectlyBelow(numShapesPtr)
     num_shape_nodes = OpenMaya.MScriptUtil(numShapesPtr).asUint()
 
-    # ToDo: loop through all shape nodes under a transform
-    mDag.extendToShapeDirectlyBelow(0)
-    shape_mObj = mDag.node()
+    for shape_index in range(num_shape_nodes):
+        mDag.extendToShapeDirectlyBelow(shape_index)
+        shape_mObj = mDag.node()
 
-    if shape_mObj.apiTypeStr() == 'kNurbsCurve':
-        pointArray = OpenMaya.MPointArray()
-        curveFn = OpenMaya.MFnNurbsCurve(mDag)
-        curveFn.getCVs(pointArray, OpenMaya.MSpace.kWorld)
+        if shape_mObj.apiTypeStr() == 'kNurbsCurve':
+            pointArray = OpenMaya.MPointArray()
+            curveFn = OpenMaya.MFnNurbsCurve(mDag)
+            curveFn.getCVs(pointArray, OpenMaya.MSpace.kWorld)
 
-        cv_pos_list = []
-        override_color = OpenMaya.MFnDependencyNode(shape_mObj).findPlug('overrideColor').asInt()
-        curve_info_dict = {mDag.partialPathName(): {'cvs': cv_pos_list, 'override_color': override_color}}
+            cv_pos_list = []
+            override_color = OpenMaya.MFnDependencyNode(shape_mObj).findPlug('overrideColor').asInt()
+            curve_info_dict[mDag.partialPathName()] = {'cvs': cv_pos_list, 'override_color': override_color}
 
-        for i in range(pointArray.length()):
-            cv_pos_list.append([pointArray[i].x, pointArray[i].y, pointArray[i].z])
+            for i in range(pointArray.length()):
+                cv_pos_list.append([pointArray[i].x, pointArray[i].y, pointArray[i].z])
 
+        mDagFn.getPath(mDag)
+        
     return curve_info_dict
 
 def read_curve_info(data):
@@ -84,8 +87,7 @@ def import_curve_data(file_path):
 
     read_curve_info(data)
 
-
-#FILE_PATH = 'c:/users/Tom/Programming/curves.json'
-#curves = ['nurbsCircle1', 'nurbsCircle2', 'nurbsCircle3', 'nurbsCircle4']
+#FILE_PATH = 'c:/temp/curves.json'
+#curves = cmds.ls(sl=1)
 #export_curve_data(curves, FILE_PATH)
 #import_curve_data(FILE_PATH)
